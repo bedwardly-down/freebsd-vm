@@ -71,11 +71,11 @@ fi
 
 
 
-osname="$VM_OS_NAME"
+osname="$VM_OS_NAME-$VM_RELEASE"
 ostype="$VM_OS_TYPE"
 sshport=$VM_SSH_PORT
 
-ovafile="$osname-$VM_RELEASE.qcow2.xz"
+ovafile="$osname.qcow2.xz"
 
 _idfile='~/.ssh/host.id_rsa'
 
@@ -107,7 +107,7 @@ importVM() {
   cat host.id_rsa >$HOME/.ssh/host.id_rsa
   chmod 600 $HOME/.ssh/host.id_rsa
 
-  bash $vmsh importVM $osname $ostype "$osname-$VM_RELEASE.qcow2"
+  bash $vmsh importVM $osname $ostype "$osname.qcow2"
 
   if [ "$DEBUG" ]; then
     bash $vmsh startWeb $osname
