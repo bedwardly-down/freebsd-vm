@@ -24,6 +24,9 @@ if [ -z "$VM_RELEASE" ]; then
   VM_RELEASE=$DEFAULT_RELEASE
 fi
 
+#set arbitrary guestname with Github Runner
+export VM_GUESTNAME
+
 export VM_RELEASE
 
 
@@ -107,10 +110,10 @@ importVM() {
   cat host.id_rsa >$HOME/.ssh/host.id_rsa
   chmod 600 $HOME/.ssh/host.id_rsa
 
-  bash $vmsh importVM $osname $ostype "$osname-$VM_RELEASE.qcow2"
+  bash $vmsh importVM $VM_GUESTNAME $ostype "$osname-$VM_RELEASE.qcow2"
 
   if [ "$DEBUG" ]; then
-    bash $vmsh startWeb $osname
+    bash $vmsh startWeb $VM_GUESTNAME
   fi
 
 }
@@ -118,18 +121,18 @@ importVM() {
 
 
 waitForVMReady() {
-  bash $vmsh waitForVMReady "$osname"
+  bash $vmsh waitForVMReady "$VM_GUESTNAME"
 }
 
 
 #using the default ksh
 execSSH() {
-  exec ssh "$osname"
+  exec ssh "$VM_GUESTNAME"
 }
 
 #using the sh 
 execSSHSH() {
-  exec ssh "$osname" sh
+  exec ssh "$VM_GUESTNAME" sh
 }
 
 
@@ -137,7 +140,7 @@ addNAT() {
   _prot="$1"
   _hostport="$2"
   _vmport="$3"
-  _vmip=$(bash $vmsh getVMIP "$osname")
+  _vmip=$(bash $vmsh getVMIP "$VM_GUESTNAME")
   echo "vm ip: $_vmip"
   if ! command -v socat; then
     echo "installing socat"
@@ -157,15 +160,15 @@ addNAT() {
 }
 
 setMemory() {
-  bash $vmsh setMemory "$osname" "$@"
+  bash $vmsh setMemory "$VM_GUESTNAME" "$@"
 }
 
 setCPU() {
-  bash $vmsh setCPU "$osname" "$@"
+  bash $vmsh setCPU "$VM_GUESTNAME" "$@"
 }
 
 startVM() {
-  bash $vmsh startVM "$osname"
+  bash $vmsh startVM "$VM_GUESTNAME"
 }
 
 
@@ -173,7 +176,7 @@ startVM() {
 rsyncToVM() {
   _pwd="$PWD"
   cd "$_oldPWD"
-  rsync -avrtopg -e 'ssh -o MACs=umac-64-etm@openssh.com' --exclude _actions --exclude _PipelineMapping  $HOME/work/  $osname:work
+  rsync -avrtopg -e 'ssh -o MACs=umac-64-etm@openssh.com' --exclude _actions --exclude _PipelineMapping  $HOME/work/  $VM_GUESTNAME:work
   cd "$_pwd"
 }
 
@@ -181,13 +184,13 @@ rsyncToVM() {
 rsyncBackFromVM() {
   _pwd="$PWD"
   cd "$_oldPWD"
-  rsync -vrtopg   -e 'ssh -o MACs=umac-64-etm@openssh.com' $osname:work/ $HOME/work
+  rsync -vrtopg   -e 'ssh -o MACs=umac-64-etm@openssh.com' $VM_GUESTNAME:work/ $HOME/work
   cd "$_pwd"
 }
 
 
 installRsyncInVM() {
-  ssh "$osname" sh <<EOF
+  ssh "$VM_GUESTNAME" sh <<EOF
 if ! command -v rsync; then
 $VM_INSTALL_CMD $VM_RSYNC_PKG
 fi
@@ -197,22 +200,22 @@ EOF
 
 runSSHFSInVM() {
 
-  if [ -e "hooks/onRunSSHFS.sh" ] && ssh "$osname" sh <hooks/onRunSSHFS.sh; then
+  if [ -e "hooks/onRunSSHFS.sh" ] && ssh "$VM_GUESTNAME" sh <hooks/onRunSSHFS.sh; then
     echo "OK";
   elif [ "$VM_SSHFS_PKG" ]; then
     echo "Installing $VM_SSHFS_PKG"
-    ssh "$osname" sh <<EOF
+    ssh "$VM_GUESTNAME" sh <<EOF
 if ! command -v sshfs ; then
 $VM_INSTALL_CMD $VM_SSHFS_PKG
 fi
 EOF
     echo "Run sshfs"
-    ssh "$osname" sh <<EOF
+    ssh "$VM_GUESTNAME" sh <<EOF
 
 if sshfs -o reconnect,ServerAliveCountMax=2,allow_other,default_permissions host:work $HOME/work ; then
   echo "run sshfs in vm is OK, show mount:"
   /sbin/mount
-  if [ "$osname" = "netbsd" ]; then
+  if [ "$VM_GUESTNAME" = "netbsd" ]; then
     tree $HOME/work
   fi
 else
@@ -230,11 +233,11 @@ EOF
 
 #run in the vm, just as soon as the vm is up
 onStarted() {
-  bash $vmsh addSSHHost $osname "$_idfile"
+  bash $vmsh addSSHHost $VM_GUESTNAME "$_idfile"
   #just touch the file, so that the user can access this file in the VM
   echo "" >>${GITHUB_ENV}
   if [ -e "hooks/onStarted.sh" ]; then
-    ssh "$osname" sh <hooks/onStarted.sh
+    ssh "$VM_GUESTNAME" sh <hooks/onStarted.sh
   fi
 }
 
@@ -242,7 +245,7 @@ onStarted() {
 #run in the vm, just after the files are initialized
 onInitialized() {
   if [ -e "hooks/onInitialized.sh" ]; then
-    ssh "$osname" sh <hooks/onInitialized.sh
+    ssh "$VM_GUESTNAME" sh <hooks/onInitialized.sh
   fi
 }
 
@@ -268,7 +271,7 @@ showDebugInfo() {
   cat $_conf_filename
 
   echo "===================Debug Info in VM============="
-  ssh "$osname" sh <<EOF
+  ssh "$VM_GUESTNAME" sh <<EOF
 pwd
 ls -lah
 whoami
