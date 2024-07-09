@@ -1,4 +1,4 @@
-# Run GitHub CI in FreeBSD ![Test](https://github.com/vmactions/freebsd-vm/workflows/Test/badge.svg)
+# Run GitHub CI in FreeBSD ![Test](https://github.com/bedwardly-down/freebsd-vm/workflows/Test/badge.svg)
 
 Use this action to run your CI in FreeBSD.
 
@@ -26,7 +26,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Test in FreeBSD
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         envs: 'MYTOKEN MYTOKEN2'
         usesh: true
@@ -46,7 +46,7 @@ jobs:
 ```
 
 
-The latest major version is: `v1`, which is the most recommended to use. (You can also use the latest full version: `v1.0.8`)  
+The latest major version is: `custom7`, which is the most recommended to use. (You can also use the latest full version: `custom7`)  
 
 
 If you are migrating from the previous `v0`, please change the `runs-on: ` to `runs-on: ubuntu-latest`
@@ -79,7 +79,7 @@ The code is shared from the host to the VM via `rsync` by default, you can choos
     - uses: actions/checkout@v4
     - name: Test
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         envs: 'MYTOKEN MYTOKEN2'
         usesh: true
@@ -108,7 +108,7 @@ When using `rsync`,  you can define `copyback: false` to not copy files back fro
     - uses: actions/checkout@v4
     - name: Test
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         envs: 'MYTOKEN MYTOKEN2'
         usesh: true
@@ -134,7 +134,7 @@ You can add NAT port between the host and the VM.
     - uses: actions/checkout@v4
     - name: Test
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         envs: 'MYTOKEN MYTOKEN2'
         usesh: true
@@ -154,7 +154,7 @@ The default memory of the VM is 6144MB, you can use `mem` option to set the memo
     - uses: actions/checkout@v4
     - name: Test
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         envs: 'MYTOKEN MYTOKEN2'
         usesh: true
@@ -164,7 +164,7 @@ The default memory of the VM is 6144MB, you can use `mem` option to set the memo
 
 
 
-It uses [the FreeBSD 14.1](conf/default.release.conf) by default, you can use `release` option to use another version of FreeBSD:
+It uses [the FreeBSD CCACHE_1](conf/default.release.conf) by default, you can use `release` option to use another version of FreeBSD:
 
 ```
 ...
@@ -172,13 +172,13 @@ It uses [the FreeBSD 14.1](conf/default.release.conf) by default, you can use `r
     - uses: actions/checkout@v4
     - name: Test
       id: test
-      uses: vmactions/freebsd-vm@v1
+      uses: bedwardly-down/freebsd-vm@custom7
       with:
         release: "13.2"
 ...
 ```
 
-All the supported releases are here: FreeBSD  12.4, 13.2, 13.3, 14.0, 14.1, test.releases [See all here](conf)
+All the supported releases are here: FreeBSD  CCACHE_1, CCACHE_2, CCACHE_3, CCACHE_4, test.releases [See all here](conf)
 
 
 # Under the hood
