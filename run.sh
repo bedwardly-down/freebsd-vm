@@ -61,6 +61,7 @@ export VM_LOGIN_TAG
 export VM_OCR
 export VM_DISK
 export VM_ARCH
+export VM_RSYNC
 
 ##########################################################
 
