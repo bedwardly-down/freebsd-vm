@@ -185,7 +185,7 @@ rsyncToVM() {
 rsyncBackFromVM() {
   _pwd="$PWD"
   cd "$_oldPWD"
-  rsync -vrtopg   -e 'ssh -o MACs=umac-64-etm@openssh.com' $VM_RSYNC /
+  rsync -vrtopg   -e 'ssh -o MACs=umac-64-etm@openssh.com' $VM_RSYNC $HOME
   cd "$_pwd"
 }
 
